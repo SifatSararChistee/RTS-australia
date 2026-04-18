@@ -1,6 +1,6 @@
+import { ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE } from "@/lib/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE } from "./src/lib/auth.ts";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
