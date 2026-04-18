@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, FileText, Menu, Search, X } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, FileText, CheckCircle, Menu, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -12,6 +12,7 @@ const navLinks = [
   { label: "About", href: "#about" },
   { label: "Countries", href: "#countries" },
   { label: "Contact", href: "#contact" },
+  { label: "Admin", href: "/admin/dashboard" },
 ];
 
 export default function Navbar() {
@@ -100,7 +101,11 @@ export default function Navbar() {
               onClick={() => setMobileOpen((prev) => !prev)}
               aria-label="Toggle navigation menu"
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -128,16 +133,25 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="pt-2 flex flex-col space-y-3">
-                <Link href="/check-visa" onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg">
+                <Link
+                  href="/check-visa"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg"
+                >
                   <FileText className="w-4 h-4 mr-2" /> Biometrics Status
                 </Link>
-                <Link href="/check-visa" onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center text-sm font-semibold text-rts-blue bg-blue-50 border border-blue-200 px-4 py-3 rounded-lg">
+                <Link
+                  href="/check-visa"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center text-sm font-semibold text-rts-blue bg-blue-50 border border-blue-200 px-4 py-3 rounded-lg"
+                >
                   <Search className="w-4 h-4 mr-2" /> Check Visa
                 </Link>
-                <Link href="/apply" onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center text-sm font-bold text-white bg-rts-red px-4 py-3 rounded-lg shadow">
+                <Link
+                  href="/apply"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center text-sm font-bold text-white bg-rts-red px-4 py-3 rounded-lg shadow"
+                >
                   <CheckCircle className="w-4 h-4 mr-2" /> Apply Now
                 </Link>
               </div>
