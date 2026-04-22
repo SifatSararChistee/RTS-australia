@@ -2,20 +2,6 @@ import { fakeApplications } from "@/lib/fakeData";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const STATUS_STYLES = {
-  pending: "bg-amber-50 text-amber-700 border border-amber-200",
-  under_review: "bg-blue-50 text-blue-700 border border-blue-200",
-  approved: "bg-green-50 text-green-700 border border-green-200",
-  rejected: "bg-red-50 text-red-700 border border-red-200",
-};
-
-const STATUS_LABELS = {
-  pending: "Pending",
-  under_review: "Under Review",
-  approved: "Approved",
-  rejected: "Rejected",
-};
-
 export async function generateStaticParams() {
   return fakeApplications.map((app) => ({ id: app.id }));
 }
@@ -81,16 +67,13 @@ export default async function ApplicantProfilePage({
         <div className="bg-white rounded-2xl border border-gray-200 p-8">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-xl font-bold text-blue-600 flex-shrink-0">
+              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-xl font-bold text-blue-600 shrink-0">
                 {initials}
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
                   {app.fullName}
                 </h1>
-                <p className="text-sm text-gray-400 mt-0.5">
-                  {app.nationality} · {app.occupation}
-                </p>
               </div>
             </div>
 
@@ -129,7 +112,7 @@ export default async function ApplicantProfilePage({
           </div>
           <Link
             href={`/check-visa`}
-            className="inline-flex items-center gap-2 bg-white text-blue-600 font-medium text-sm px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-colors flex-shrink-0"
+            className="inline-flex items-center gap-2 bg-white text-blue-600 font-medium text-sm px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-colors shrink-0"
           >
             Check Visa Status →
           </Link>

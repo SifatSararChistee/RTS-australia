@@ -1,20 +1,6 @@
 import { fakeApplications } from "@/lib/fakeData";
 import Link from "next/link";
 
-const STATUS_STYLES = {
-  pending: "bg-amber-50 text-amber-700 border border-amber-200",
-  under_review: "bg-blue-50 text-blue-700 border border-blue-200",
-  approved: "bg-green-50 text-green-700 border border-green-200",
-  rejected: "bg-red-50 text-red-700 border border-red-200",
-};
-
-const STATUS_LABELS = {
-  pending: "Pending",
-  under_review: "Under Review",
-  approved: "Approved",
-  rejected: "Rejected",
-};
-
 export const metadata = {
   title: "All Applicants — RTS Australia",
   description: "View all visa applicants",
@@ -47,7 +33,7 @@ export default function AllApplicantsPage() {
         </p>
 
         <div className="space-y-3">
-          {fakeApplications.map((app, i) => (
+          {fakeApplications.map((app) => (
             <Link
               key={app.id}
               href={`/applicants/${app.id}`}
@@ -55,7 +41,7 @@ export default function AllApplicantsPage() {
             >
               <div className="flex items-center gap-4">
                 {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 text-sm font-semibold text-blue-600">
+                <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-sm font-semibold text-blue-600">
                   {app.fullName
                     .split(" ")
                     .map((n) => n[0])
