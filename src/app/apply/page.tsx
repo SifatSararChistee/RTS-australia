@@ -16,6 +16,7 @@ export default function ApplyPage() {
     phone: "",
     nid: "",
     passportNumber: "",
+    passportValidity: "",
     visaType: "Tourist Visa",
     currentAddress: "",
     permanentAddress: "",
@@ -32,27 +33,33 @@ export default function ApplyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log("Submitted Application Data:", formData);
 
-    try {
-      const res = await fetch("/api/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+    toast.success("Application submitted successfully!");
+    setSuccess(true);
+    setLoading(false);
 
-      const data = await res.json();
+    // try {
+    //   const res = await fetch("/api/apply", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(formData),
+    //   });
 
-      if (!res.ok) {
-        toast.error(data.error || "Failed to submit application");
-      } else {
-        toast.success("Application submitted successfully!");
-        setSuccess(true);
-      }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    //   const data = await res.json();
+
+    //   if (!res.ok) {
+    //     toast.error(data.error || "Failed to submit application");
+    //   } else {
+    //     toast.success("Application submitted successfully!");
+    //     setSuccess(true);
+    //   }
+    // } catch (error) {
+    //   toast.error("An error occurred. Please try again.");
+    //   console.log(error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   if (success) {
@@ -230,9 +237,9 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Row 4: Passport + Visa Type */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
+            {/* Row 4: Passport + Passport Validity + Visa Type */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Passport Number <span className="text-rts-red">*</span>
                 </label>
@@ -246,7 +253,20 @@ export default function ApplyPage() {
                   placeholder="A1234567"
                 />
               </div>
-              <div>
+              <div className="sm:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Passport Validity <span className="text-rts-red">*</span>
+                </label>
+                <input
+                  type="date"
+                  name="passportValidity"
+                  required
+                  value={formData.passportValidity}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
+              <div className="sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Visa Type <span className="text-rts-red">*</span>
                 </label>
