@@ -4,27 +4,4 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model Application {
-  passportNumber String     @id
-  fullName       String
-  email          String
-  phone          String
-  visaType       String
-  message        String?
-  status         String     @default("Applied") // Applied, Biometrics Pending, Approved, Rejected
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  documents      Document[]
-}
-
-model Document {
-  id             String      @id @default(uuid())
-  application    Application @relation(fields: [passportNumber], references: [passportNumber])
-  passportNumber String
-  fileName       String
-  fileUrl        String
-  uploadedAt     DateTime    @default(now())
 }
