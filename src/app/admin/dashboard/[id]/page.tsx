@@ -4,6 +4,7 @@ import { ApplicationStatus, fakeApplications } from "@/lib/fakeData";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const STATUS_STYLES: Record<ApplicationStatus, string> = {
   pending: "bg-amber-50 text-amber-700 border border-amber-200",
@@ -40,6 +41,8 @@ export default function ApplicationDetailPage() {
   );
   const [adminNote, setAdminNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [visaFile, setVisaFile] = useState<File | null>(null);
 
   const app = fakeApplications.find((a) => a.id === id);
 
@@ -67,6 +70,38 @@ export default function ApplicationDetailPage() {
     setShowConfirm(null);
     setAdminNote("");
     setLoading(false);
+  }
+
+  async function handleUploadVisa() {
+    if (!visaFile) {
+      toast.error("Please select a file first");
+      return;
+    }
+
+    setUploadLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", visaFile);
+      formData.append("passportNumber", app!.passportNumber);
+
+      const res = await fetch("/api/upload-visa", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Upload failed");
+      }
+
+      toast.success("E-Visa uploaded successfully!");
+      setVisaFile(null);
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred during upload");
+    } finally {
+      setUploadLoading(false);
+    }
   }
 
   return (
@@ -289,6 +324,51 @@ export default function ApplicationDetailPage() {
         )}
 
         {/* Metadata */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            E-Visa Upload
+          </h2>
+          <div className="flex items-center gap-4">
+            <input
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => setVisaFile(e.target.files ? e.target.files[0] : null)}
+              className="block w-full text-sm text-gray-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100"
+            />
+            <button
+              onClick={handleUploadVisa}
+              disabled={uploadLoading || !visaFile}
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-60"
+            >
+              {uploadLoading ? "Uploading..." : "Upload Visa"}
+            </button>
+          </div>
+          {visaFile && (
+            <p className="mt-2 text-xs text-gray-500">
+              Selected file: {visaFile.name}
+            </p>
+          )}
+        </div>
+
         <div className="flex items-center gap-6 text-xs text-gray-400 pb-4">
           <span>
             Submitted {new Date(app.submittedAt).toLocaleString("en-AU")}

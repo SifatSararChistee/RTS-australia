@@ -267,7 +267,6 @@ export default function DocumentCheckPage() {
                     {result.documents.map((doc) => (
                       <a
                         key={doc.id}
-                        enclassName="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 transition-all group hover:border-rts-blue/30"
                         href={doc.fileUrl}
                         target="_blank"
                         rel="noreferrer"
