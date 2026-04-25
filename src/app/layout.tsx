@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { Montserrat, Inter } from "next/font/google";
-import "./globals.css";
 import Navbar from "@/components/Navbar";
+import type { Metadata } from "next";
+import { Inter, Montserrat } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   title: "RTS Australia | Premium Visa & Migration Services",
   description:
     "Australia's most trusted visa and migration agency. 20+ years of experience, 99% success rate, MARA-certified consultants. Apply for your visa today.",
-  keywords: "visa australia, migration agent, australian visa, student visa, work visa, business visa",
+  keywords:
+    "visa australia, migration agent, australian visa, student visa, work visa, business visa",
 };
 
 export default function RootLayout({
@@ -30,11 +31,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${montserrat.variable} ${inter.variable}`}>
-      <body className="bg-white min-h-screen flex flex-col" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <body
+        className="bg-white min-h-screen flex flex-col"
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
         <Navbar />
-        <main className="flex-grow flex flex-col">
-          {children}
-        </main>
+        <main className="grow flex flex-col">{children}</main>
         <Toaster position="top-center" />
       </body>
     </html>

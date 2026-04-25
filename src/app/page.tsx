@@ -385,14 +385,14 @@ export default function Home() {
               transition={{ duration: 0.7 }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-4/3">
                 <Image
                   src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80&fit=crop"
                   alt="Professional migration consultation meeting"
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-rts-blue/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-tr from-rts-blue/20 to-transparent" />
               </div>
 
               {/* Floating Badge */}
@@ -404,7 +404,7 @@ export default function Home() {
                 className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-2xl p-5 border border-gray-100 max-w-[200px]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-rts-blue flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-rts-blue flex items-center justify-center shrink-0">
                     <Award className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -493,7 +493,7 @@ export default function Home() {
                     variants={fadeUp}
                     className="flex items-center gap-3"
                   >
-                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                       <CheckCircle className="w-3 h-3 text-green-600" />
                     </div>
                     <span className="text-gray-700 font-medium">{item}</span>
@@ -704,7 +704,7 @@ export default function Home() {
                   className={`relative flex items-center justify-center rounded-full shadow-lg transition-all duration-400
                   ${
                     country.featured
-                      ? "w-36 h-36 bg-gradient-to-br from-rts-blue to-rts-blue-light ring-4 ring-rts-red/30 group-hover:ring-rts-red shadow-rts-blue/30"
+                      ? "w-36 h-36 bg-linear-to-br from-rts-blue to-rts-blue-light ring-4 ring-rts-red/30 group-hover:ring-rts-red shadow-rts-blue/30"
                       : "w-28 h-28 bg-gray-100 grayscale group-hover:grayscale-0 group-hover:shadow-rts-red/20 group-hover:ring-2 group-hover:ring-rts-red/50"
                   } overflow-hidden`}
                 >
@@ -775,9 +775,7 @@ export default function Home() {
                 className="bg-white rounded-3xl shadow-xl border border-gray-100 p-10 text-center relative overflow-hidden"
               >
                 {/* Large quote mark */}
-                <div className="absolute top-4 left-8 text-8xl text-gray-100 font-serif leading-none select-none">
-                  "
-                </div>
+                <div className="absolute top-4 left-8 text-8xl text-gray-100 font-serif leading-none select-none"></div>
 
                 {/* Stars */}
                 <div className="flex justify-center gap-1 mb-6">
@@ -1031,7 +1029,7 @@ export default function Home() {
               </h4>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 text-rts-red flex-shrink-0 mt-0.5" />
+                  <MapPin className="w-4 h-4 text-rts-red shrink-0 mt-0.5" />
                   <span className="text-gray-400 text-sm">
                     Level 12, 680 George Street,
                     <br />
@@ -1039,7 +1037,7 @@ export default function Home() {
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-rts-red flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-rts-red shrink-0" />
                   <a
                     href="tel:+61299999999"
                     className="text-gray-400 hover:text-white text-sm transition-colors"
@@ -1048,7 +1046,7 @@ export default function Home() {
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-rts-red flex-shrink-0" />
+                  <Mail className="w-4 h-4 text-rts-red shrink-0" />
                   <a
                     href="mailto:info@rtsaustralia.com.au"
                     className="text-gray-400 hover:text-white text-sm transition-colors"
@@ -1075,10 +1073,15 @@ export default function Home() {
 
           {/* Bottom */}
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} RTS Australia. All rights
-              reserved. MARA registration: 00000000.
-            </p>
+            <div className="flex flex-col items-center md:items-start gap-1">
+              <p className="text-gray-500 text-sm">
+                &copy; {new Date().getFullYear()} RTS Australia. All rights
+                reserved. MARA registration: 00000000.
+              </p>
+              <Link href="/admin/dashboard" className="text-gray-600 hover:text-rts-blue text-[10px] uppercase tracking-widest transition-colors">
+                Admin Portal
+              </Link>
+            </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-gray-500" />
               <span className="text-gray-500 text-sm">

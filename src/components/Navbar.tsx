@@ -13,7 +13,6 @@ const navLinks = [
   { label: "Countries", href: "#countries" },
   { label: "Applicants", href: "/applicants" },
   { label: "Contact", href: "#contact" },
-  { label: "Admin", href: "/admin/dashboard" },
 ];
 
 export default function Navbar() {
@@ -69,28 +68,36 @@ export default function Navbar() {
             </div>
 
             {/* Desktop CTAs */}
-            <div className="hidden lg:flex flex-row items-center space-x-3">
+            <div className="hidden lg:flex flex-row items-center space-x-2">
               <Link
-                href="/check-visa"
-                className="flex items-center text-sm font-semibold text-gray-700 hover:text-rts-blue bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-all duration-200 border border-gray-200 hover:border-rts-blue"
+                href="/document-check"
+                className="flex items-center text-xs font-semibold text-gray-700 hover:text-rts-blue bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition-all duration-200 border border-gray-200 hover:border-rts-blue"
               >
-                <FileText className="w-4 h-4 mr-2" />
+                <FileText className="w-3.5 h-3.5 mr-1.5" />
+                Document Check
+              </Link>
+
+              <Link
+                href="/biometrics-status"
+                className="flex items-center text-xs font-semibold text-gray-700 hover:text-rts-blue bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition-all duration-200 border border-gray-200 hover:border-rts-blue"
+              >
+                <FileText className="w-3.5 h-3.5 mr-1.5" />
                 Biometrics Status
               </Link>
 
               <Link
                 href="/check-visa"
-                className="flex items-center text-sm font-semibold text-rts-blue bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition-all duration-200 border border-blue-200"
+                className="flex items-center text-xs font-semibold text-rts-blue bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-all duration-200 border border-blue-200"
               >
-                <Search className="w-4 h-4 mr-2" />
+                <Search className="w-3.5 h-3.5 mr-1.5" />
                 Check Visa
               </Link>
 
               <Link
                 href="/apply"
-                className="flex items-center text-sm font-bold text-white bg-rts-red hover:bg-rts-red-dark px-5 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-red-200 hover:shadow-lg"
+                className="flex items-center text-xs font-bold text-white bg-rts-red hover:bg-rts-red-dark px-4 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-red-200 hover:shadow-lg"
               >
-                <CheckCircle className="w-4 h-4 mr-2" />
+                <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
                 Apply Now
               </Link>
             </div>
@@ -135,7 +142,14 @@ export default function Navbar() {
               ))}
               <div className="pt-2 flex flex-col space-y-3">
                 <Link
-                  href="/check-visa"
+                  href="/document-check"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg"
+                >
+                  <FileText className="w-4 h-4 mr-2" /> Document Check
+                </Link>
+                <Link
+                  href="/biometrics-status"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 px-4 py-3 rounded-lg"
                 >
