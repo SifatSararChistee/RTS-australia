@@ -1,53 +1,35 @@
-import { NextResponse } from 'next/server';
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+);
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ passportNumber: string }> }
+  { params }: { params: Promise<{ passportNumber: string }> },
 ) {
-  try {
-    const { passportNumber } = await params;
-    const decodedPassport = decodeURIComponent(passportNumber);
+  const { passportNumber } = await params;
 
-    // Mock data for demonstration purposes
-    const mockApplications: Record<string, any> = {
-      "A1234567": {
-        passportNumber: "A1234567",
-        fullName: "John Doe",
-        status: "Approved",
-        documents: [
-          {
-            id: "doc1",
-            fileName: "eVisa_JohnDoe.pdf",
-            fileUrl: "https://example.com/visa.pdf",
-            uploadedAt: new Date().toISOString(),
-          },
-        ],
-      },
-      "B9876543": {
-        passportNumber: "B9876543",
-        fullName: "Jane Smith",
-        status: "Biometrics Pending",
-        documents: [],
-      },
-    };
+  const { data, error } = await supabase
+    .from("applications")
+    .select(
+      `
+      *,
+      documents (
+        id,
+        title,
+        link,
+        uploaded_at
+      )
+    `,
+    )
+    .ilike("passport_number", passportNumber.trim())
+    .single();
 
-    const application = mockApplications[decodedPassport.toUpperCase()];
-
-    if (!application) {
-      return NextResponse.json(
-        { error: 'No record found for the provided passport number' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      application: application,
-    });
-  } catch (error) {
-    console.error('Status API Error:', error);
-    return NextResponse.json(
-      { error: 'An internal server error occurred' },
-      { status: 500 }
-    );
+  if (error || !data) {
+    return Response.json({ error: "No record found." }, { status: 404 });
   }
+
+  return Response.json(data);
 }

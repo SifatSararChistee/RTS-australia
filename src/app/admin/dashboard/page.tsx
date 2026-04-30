@@ -1,9 +1,26 @@
 "use client";
 
-import { Application, ApplicationStatus } from "@/lib/mockData";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+
+type ApplicationStatus = "approved" | "pending" | "rejected";
+
+type BiometricsStatus = "completed" | "pending" | "not_required";
+
+interface Application {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  passport_number: string;
+  passport_validity: string;
+  visa_type: string;
+  status: ApplicationStatus;
+  biometrics_status: BiometricsStatus;
+  created_at: string;
+  documents?: { id: string }[];
+}
 
 const STATUS_CONFIG: Record<
   ApplicationStatus,
@@ -526,7 +543,7 @@ function ApplicationRow({ app, index }: { app: Application; index: number }) {
         {(app.documents?.length ?? 0) > 0 && (
           <span className="flex items-center gap-0.5 text-[10px] text-slate-400">
             <IconDoc />
-            {app.documents.length}
+            {app.documents?.length ?? 0}
           </span>
         )}
         <Link

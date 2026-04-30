@@ -1,6 +1,5 @@
 "use client";
 
-import { ApplicationStatus, BiometricsStatus } from "@/lib/mockData";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -9,6 +8,9 @@ import toast from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+type ApplicationStatus = "approved" | "pending" | "rejected";
+type BiometricsStatus = "completed" | "pending" | "not_required";
+
 interface DbDocument {
   id: string;
   title: string;
@@ -16,7 +18,7 @@ interface DbDocument {
   uploaded_at: string;
 }
 
-interface Application {
+export interface Application {
   id: string;
   full_name: string;
   father_name: string;
@@ -29,10 +31,10 @@ interface Application {
   visa_type: string;
   current_address: string;
   permanent_address: string;
-  status: ApplicationStatus;
+  status: "approved" | "pending" | "rejected";
   evisa_link: string | null;
   visa_grant_number: string | null;
-  biometrics_status: BiometricsStatus;
+  biometrics_status: "completed" | "pending" | "not_required";
   created_at: string;
   updated_at: string;
   documents: DbDocument[];
