@@ -8,18 +8,20 @@ import toast from "react-hot-toast";
 export default function ApplyPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [submittedPassport, setSubmittedPassport] = useState("");
+
   const [formData, setFormData] = useState({
-    fullName: "",
-    fatherName: "",
-    motherName: "",
+    full_name: "",
+    father_name: "",
+    mother_name: "",
     email: "",
     phone: "",
     nid: "",
-    passportNumber: "",
-    passportValidity: "",
-    visaType: "Tourist Visa",
-    currentAddress: "",
-    permanentAddress: "",
+    passport_number: "",
+    passport_validity: "",
+    visa_type: "Tourist Visa",
+    current_address: "",
+    permanent_address: "",
   });
 
   const handleChange = (
@@ -33,33 +35,32 @@ export default function ApplyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Submitted Application Data:", formData);
 
-    toast.success("Application submitted successfully!");
-    setSuccess(true);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Fields mapped exactly to DB columns.
+        // status, evisa_link, biometrics_status, and documents
+        // are set by the server/admin — not sent from this form.
+        body: JSON.stringify(formData),
+      });
 
-    // try {
-    //   const res = await fetch("/api/apply", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(formData),
-    //   });
+      const data = await res.json();
 
-    //   const data = await res.json();
-
-    //   if (!res.ok) {
-    //     toast.error(data.error || "Failed to submit application");
-    //   } else {
-    //     toast.success("Application submitted successfully!");
-    //     setSuccess(true);
-    //   }
-    // } catch (error) {
-    //   toast.error("An error occurred. Please try again.");
-    //   console.log(error);
-    // } finally {
-    //   setLoading(false);
-    // }
+      if (!res.ok) {
+        toast.error(data.error || "Failed to submit application");
+      } else {
+        setSubmittedPassport(formData.passport_number);
+        toast.success("Application submitted successfully!");
+        setSuccess(true);
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (success) {
@@ -78,8 +79,8 @@ export default function ApplyPage() {
           </h2>
           <p className="text-gray-600 mb-8">
             Your application under passport number{" "}
-            <span className="font-semibold">{formData.passportNumber}</span> has
-            been securely lodged. You will be notified of any status updates.
+            <span className="font-semibold">{submittedPassport}</span> has been
+            securely lodged. You will be notified of any status updates.
           </p>
           <a
             href="/check-visa"
@@ -141,7 +142,7 @@ export default function ApplyPage() {
           className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl w-full border border-gray-100"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Row 1: Full Name + Father Name */}
+            {/* Row 1: full_name + father_name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -149,9 +150,9 @@ export default function ApplyPage() {
                 </label>
                 <input
                   type="text"
-                  name="fullName"
+                  name="full_name"
                   required
-                  value={formData.fullName}
+                  value={formData.full_name}
                   onChange={handleChange}
                   className={inputClass}
                   placeholder="As per passport"
@@ -163,9 +164,9 @@ export default function ApplyPage() {
                 </label>
                 <input
                   type="text"
-                  name="fatherName"
+                  name="father_name"
                   required
-                  value={formData.fatherName}
+                  value={formData.father_name}
                   onChange={handleChange}
                   className={inputClass}
                   placeholder="Father's full name"
@@ -173,7 +174,7 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Row 2: Mother Name + Email */}
+            {/* Row 2: mother_name + email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -181,9 +182,9 @@ export default function ApplyPage() {
                 </label>
                 <input
                   type="text"
-                  name="motherName"
+                  name="mother_name"
                   required
-                  value={formData.motherName}
+                  value={formData.mother_name}
                   onChange={handleChange}
                   className={inputClass}
                   placeholder="Mother's full name"
@@ -205,7 +206,7 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Row 3: Phone + NID */}
+            {/* Row 3: phone + nid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -237,7 +238,7 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Row 4: Passport + Passport Validity + Visa Type */}
+            {/* Row 4: passport_number + passport_validity + visa_type */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="sm:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -245,9 +246,9 @@ export default function ApplyPage() {
                 </label>
                 <input
                   type="text"
-                  name="passportNumber"
+                  name="passport_number"
                   required
-                  value={formData.passportNumber}
+                  value={formData.passport_number}
                   onChange={handleChange}
                   className={`${inputClass} uppercase`}
                   placeholder="A1234567"
@@ -259,9 +260,9 @@ export default function ApplyPage() {
                 </label>
                 <input
                   type="date"
-                  name="passportValidity"
+                  name="passport_validity"
                   required
-                  value={formData.passportValidity}
+                  value={formData.passport_validity}
                   onChange={handleChange}
                   className={inputClass}
                 />
@@ -271,8 +272,8 @@ export default function ApplyPage() {
                   Visa Type <span className="text-rts-red">*</span>
                 </label>
                 <select
-                  name="visaType"
-                  value={formData.visaType}
+                  name="visa_type"
+                  value={formData.visa_type}
                   onChange={handleChange}
                   className={`${inputClass} bg-white`}
                 >
@@ -286,32 +287,32 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Current Address */}
+            {/* current_address */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Current Address <span className="text-rts-red">*</span>
               </label>
               <textarea
-                name="currentAddress"
+                name="current_address"
                 rows={2}
                 required
-                value={formData.currentAddress}
+                value={formData.current_address}
                 onChange={handleChange}
                 className={`${inputClass} resize-none`}
                 placeholder="House, Road, Area, City"
               />
             </div>
 
-            {/* Permanent Address */}
+            {/* permanent_address */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Permanent Address <span className="text-rts-red">*</span>
               </label>
               <textarea
-                name="permanentAddress"
+                name="permanent_address"
                 rows={2}
                 required
-                value={formData.permanentAddress}
+                value={formData.permanent_address}
                 onChange={handleChange}
                 className={`${inputClass} resize-none`}
                 placeholder="House, Road, Area, City"

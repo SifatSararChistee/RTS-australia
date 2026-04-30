@@ -3,12 +3,15 @@
 import { motion } from "framer-motion";
 import {
   AlertCircle,
+  Calendar,
+  CreditCard,
   FileDown,
+  FileText,
+  Hash,
   Loader2,
   Search,
   ShieldCheck,
   User,
-  FileText,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -26,16 +29,73 @@ type ApplicationResult = {
   documents: Document[];
 };
 
+type FormFields = {
+  fullName: string;
+  passportNumber: string;
+  visaGrantNumber: string;
+  dateOfBirth: string;
+};
+
+const inputFields = [
+  {
+    key: "fullName" as keyof FormFields,
+    label: "Full Name",
+    placeholder: "As shown on passport",
+    icon: User,
+    type: "text",
+    transform: (v: string) => v,
+  },
+  {
+    key: "passportNumber" as keyof FormFields,
+    label: "Passport Number",
+    placeholder: "e.g. A12345678",
+    icon: CreditCard,
+    type: "text",
+    transform: (v: string) => v.toUpperCase(),
+  },
+  {
+    key: "visaGrantNumber" as keyof FormFields,
+    label: "Visa Grant Number",
+    placeholder: "e.g. VGN-2024-000123",
+    icon: Hash,
+    type: "text",
+    transform: (v: string) => v.toUpperCase(),
+  },
+  {
+    key: "dateOfBirth" as keyof FormFields,
+    label: "Date of Birth",
+    placeholder: "",
+    icon: Calendar,
+    type: "date",
+    transform: (v: string) => v,
+  },
+];
+
 export default function CheckVisaPage() {
-  const [passportNumber, setPassportNumber] = useState("");
+  const [form, setForm] = useState<FormFields>({
+    fullName: "",
+    passportNumber: "",
+    visaGrantNumber: "",
+    dateOfBirth: "",
+  });
   const [isScanning, setIsScanning] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
   const [result, setResult] = useState<ApplicationResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const isFormComplete = Object.values(form).every((v) => v.trim() !== "");
+
+  const handleChange = (key: keyof FormFields, value: string) => {
+    const field = inputFields.find((f) => f.key === key);
+    setForm((prev) => ({
+      ...prev,
+      [key]: field ? field.transform(value) : value,
+    }));
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!passportNumber.trim()) return;
+    if (!isFormComplete) return;
 
     setErrorMsg(null);
     setResult(null);
@@ -45,27 +105,35 @@ export default function CheckVisaPage() {
     try {
       const audio = new Audio("/scanning.mp3");
       audio.volume = 0.5;
-      audio.play().catch(() => {
-        console.warn("Sound playback prevented by browser or missing file.");
-      });
+      audio.play().catch(() => {});
     } catch {
       // Ignore audio errors quietly
     }
 
     setTimeout(async () => {
       try {
-        const res = await fetch(
-          `/api/status/${encodeURIComponent(passportNumber.trim())}`,
-        );
+        const params = new URLSearchParams({
+          passportNumber: form.passportNumber,
+          fullName: form.fullName,
+          visaGrantNumber: form.visaGrantNumber,
+          dateOfBirth: form.dateOfBirth,
+        });
+
+        const res = await fetch(`/api/status?${params.toString()}`);
         const data = await res.json();
 
         if (!res.ok) {
-          setErrorMsg(data.error || "Your record could not be found in our secure database.");
+          setErrorMsg(
+            data.error ||
+              "No matching record found. Please ensure all details are correct.",
+          );
         } else {
           setResult(data.application);
         }
       } catch (err) {
-        setErrorMsg("We are experiencing connection issues. Please try again later.");
+        setErrorMsg(
+          "We are experiencing connection issues. Please try again later.",
+        );
         console.log(err);
       } finally {
         setIsScanning(false);
@@ -89,6 +157,7 @@ export default function CheckVisaPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 py-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center font-sans">
+      {/* Header */}
       <div className="text-center mb-12 mt-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -101,57 +170,107 @@ export default function CheckVisaPage() {
           Visa Status Portal
         </h1>
         <p className="text-slate-500 max-w-xl mx-auto text-lg leading-relaxed">
-          Access your application progress and download your e-visa securely using your passport number.
+          Enter all four details below exactly as they appear on your documents.
+          All fields must match our records to retrieve your application.
         </p>
       </div>
 
       <div className="w-full max-w-2xl">
-        <form
+        {/* Search Form */}
+        <motion.form
           onSubmit={handleSearch}
-          className="relative mb-16 group"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 mb-8"
         >
-          <div className="relative flex items-center shadow-sm group-focus-within:shadow-md transition-shadow duration-300 rounded-3xl">
-            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-400" />
-            </div>
-            <input
-              type="text"
-              required
-              value={passportNumber}
-              onChange={(e) => setPassportNumber(e.target.value)}
-              className="block w-full pl-13 pr-36 py-6 rounded-3xl border border-slate-200 bg-white focus:ring-4 focus:ring-rts-blue/10 focus:border-rts-blue outline-none transition-all placeholder:text-slate-300 uppercase text-lg font-medium shadow-sm"
-              placeholder="ENTER PASSPORT NUMBER"
-              style={{ paddingLeft: '3.25rem' }}
-            />
-            <button
-              type="submit"
-              disabled={isScanning || !passportNumber.trim()}
-              className="absolute right-2 px-6 py-3 bg-rts-blue hover:bg-blue-900 text-white font-bold rounded-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center shadow-lg shadow-blue-900/20"
-            >
-              {isScanning ? (
-                <Loader2 className="animate-spin w-5 h-5 mx-2" />
-              ) : (
-                "Check Status"
-              )}
-            </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+            {inputFields.map((field, idx) => {
+              const Icon = field.icon;
+              return (
+                <motion.div
+                  key={field.key}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * idx }}
+                  className="flex flex-col gap-1.5"
+                >
+                  <label
+                    htmlFor={field.key}
+                    className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                  >
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <Icon className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <input
+                      id={field.key}
+                      type={field.type}
+                      required
+                      value={form[field.key]}
+                      onChange={(e) => handleChange(field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      className={`w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50
+                        focus:ring-4 focus:ring-rts-blue/10 focus:border-rts-blue focus:bg-white
+                        outline-none transition-all text-slate-800 font-medium placeholder:text-slate-300
+                        ${
+                          field.key === "passportNumber" ||
+                          field.key === "visaGrantNumber"
+                            ? "uppercase tracking-widest"
+                            : ""
+                        }`}
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-        </form>
 
+          {/* Divider hint */}
+          <p className="text-xs text-slate-400 text-center mb-6">
+            All four fields are required and must match your official records.
+          </p>
+
+          <button
+            type="submit"
+            disabled={isScanning || !isFormComplete}
+            className="w-full flex items-center justify-center gap-2 py-4 bg-rts-blue hover:bg-blue-900
+              text-white font-bold rounded-2xl transition-all disabled:opacity-60 disabled:cursor-not-allowed
+              shadow-lg shadow-blue-900/20 text-base"
+          >
+            {isScanning ? (
+              <>
+                <Loader2 className="animate-spin w-5 h-5" />
+                Verifying Records…
+              </>
+            ) : (
+              <>
+                <Search className="w-5 h-5" />
+                Check Visa Status
+              </>
+            )}
+          </button>
+        </motion.form>
+
+        {/* Scanning state */}
         {isScanning && (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-10">
             <div className="relative w-20 h-20">
-              <div className="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-rts-blue rounded-full border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 border-4 border-slate-200 rounded-full" />
+              <div className="absolute inset-0 border-4 border-rts-blue rounded-full border-t-transparent animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6 text-rts-blue animate-pulse" />
               </div>
             </div>
             <p className="mt-6 text-slate-400 font-medium animate-pulse tracking-widest text-xs uppercase">
-              Verifying secure records...
+              Verifying secure records…
             </p>
           </div>
         )}
 
+        {/* Error state */}
         {hasScanned && !isScanning && errorMsg && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -162,12 +281,17 @@ export default function CheckVisaPage() {
               <AlertCircle className="w-6 h-6 text-rose-500" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">
-              No Record Found
+              No Matching Record Found
             </h3>
             <p className="text-slate-500">{errorMsg}</p>
+            <p className="mt-3 text-xs text-slate-400">
+              Please double-check your name, passport number, visa grant number,
+              and date of birth, then try again.
+            </p>
           </motion.div>
         )}
 
+        {/* Result card */}
         {hasScanned && !isScanning && result && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -191,13 +315,17 @@ export default function CheckVisaPage() {
             <div className="p-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Full Name</p>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Full Name
+                  </p>
                   <p className="text-xl font-bold text-slate-900">
                     {result.fullName}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Passport Number</p>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    Passport Number
+                  </p>
                   <p className="text-xl font-mono font-bold text-rts-blue uppercase tracking-tight">
                     {result.passportNumber}
                   </p>

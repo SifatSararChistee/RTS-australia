@@ -1,9 +1,61 @@
-import { fakeApplications } from "@/lib/fakeData";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+interface Document {
+  id: string;
+  link: string;
+  title: string;
+  uploaded_at: string;
+}
+
+interface Application {
+  id: string;
+  full_name: string;
+  father_name: string;
+  mother_name: string;
+  email: string;
+  phone: string;
+  nid: string;
+  passport_number: string;
+  passport_validity: string;
+  visa_type: string;
+  current_address: string;
+  permanent_address: string;
+  status: "approved" | "pending" | "rejected";
+  evisa_link: string | null;
+  visa_grant_number: string | null;
+  biometrics_status: "completed" | "pending" | "not_required";
+  created_at: string;
+  updated_at: string;
+  documents: Document[];
+}
+
+async function getAllApplications(): Promise<Application[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/all-applications`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+function getInitials(name: string): string {
+  if (!name?.trim()) return "?";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export async function generateStaticParams() {
-  return fakeApplications.map((app) => ({ id: app.id }));
+  const apps = await getAllApplications();
+  return apps.map((app) => ({ id: app.id }));
 }
 
 export async function generateMetadata({
@@ -12,9 +64,10 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const app = fakeApplications.find((a) => a.id === id);
+  const apps = await getAllApplications();
+  const app = apps.find((a) => a.id === id);
   return {
-    title: app ? `${app.fullName} — RTS Australia` : "Applicant Not Found",
+    title: app ? `${app.full_name} — RTS Australia` : "Applicant Not Found",
   };
 }
 
@@ -24,16 +77,18 @@ export default async function ApplicantProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const app = fakeApplications.find((a) => a.id === id);
+  const apps = await getAllApplications();
+  const app = apps.find((a) => a.id === id);
 
   if (!app) notFound();
 
-  const initials = app.fullName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = getInitials(app.full_name);
+
+  const STATUS_STYLES: Record<Application["status"], string> = {
+    approved: "bg-green-50 text-green-700 border border-green-200",
+    pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    rejected: "bg-red-50 text-red-700 border border-red-200",
+  };
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -72,14 +127,19 @@ export default async function ApplicantProfilePage({
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {app.fullName}
+                  {app.full_name}
                 </h1>
+                <p className="text-sm text-gray-400 mt-1">{app.visa_type}</p>
+                <span
+                  className={`inline-block mt-2 text-xs font-medium px-2.5 py-1 rounded-full capitalize border ${STATUS_STYLES[app.status]}`}
+                >
+                  {app.status}
+                </span>
               </div>
             </div>
 
-            {/* CTA */}
             <Link
-              href={`/check-visa`}
+              href="/check-visa"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
             >
               <svg
@@ -100,21 +160,21 @@ export default async function ApplicantProfilePage({
           </div>
         </div>
 
-        {/* Check visa CTA banner */}
+        {/* Track CTA banner */}
         <div className="bg-blue-600 rounded-2xl p-6 flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-white font-semibold">
               Want to track this application?
             </p>
             <p className="text-blue-200 text-sm mt-0.5">
-              Check the live visa status for {app.fullName.split(" ")[0]}.
+              Check the live visa status for {app.full_name.split(" ")[0]}.
             </p>
           </div>
           <Link
-            href={`/check-visa`}
+            href="/check-visa"
             className="inline-flex items-center gap-2 bg-white text-blue-600 font-medium text-sm px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-colors shrink-0"
           >
-            Check Visa Status →
+            Check Visa Status &rarr;
           </Link>
         </div>
       </div>
