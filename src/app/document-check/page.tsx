@@ -81,16 +81,12 @@ export default function DocumentCheckPage() {
     const lowerUrl = url.toLowerCase();
     const lowerTitle = title.toLowerCase();
 
-    if (
-      lowerUrl.includes(".pdf") ||
-      lowerTitle.includes(".pdf") ||
-      lowerUrl.includes("mime=pdf") ||
-      lowerUrl.includes("export=download")
-    ) {
-      return "pdf";
-    }
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+    const isImage = imageExtensions.some(
+      (ext) => lowerUrl.includes(ext) || lowerTitle.includes(ext),
+    );
 
-    return "image";
+    return isImage ? "image" : "pdf";
   }
 
   function getEmbedUrl(
@@ -496,8 +492,8 @@ export default function DocumentCheckPage() {
                       </div>
 
                       <p className="px-5 py-2.5 text-[10px] text-slate-400 border-t border-slate-100 bg-slate-50 shrink-0">
-                        If the file does not load, click "Open File". Ensure
-                        sharing is set to "Anyone with the link can view".
+                        If the file does not load, click Open File. Ensure
+                        sharing is set to Anyone with the link can view
                       </p>
                     </motion.div>
                   </motion.div>

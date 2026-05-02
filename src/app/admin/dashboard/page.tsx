@@ -237,8 +237,10 @@ export default function AdminDashboard() {
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data: Application[] = await res.json();
       setApplications(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to load applications.");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load applications.",
+      );
     } finally {
       setLoading(false);
     }
