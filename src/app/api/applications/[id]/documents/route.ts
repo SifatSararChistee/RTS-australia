@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 import { verifyAdminSession } from "@/lib/auth-utils";
+import { supabase } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/applications/[id]/documents
 export async function GET(
@@ -25,8 +25,9 @@ export async function GET(
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }
 
@@ -46,7 +47,10 @@ export async function POST(
       return NextResponse.json({ error: "link is required." }, { status: 400 });
     }
 
-    if (!link.includes("drive.google.com") && !link.includes("docs.google.com")) {
+    if (
+      !link.includes("drive.google.com") &&
+      !link.includes("docs.google.com")
+    ) {
       return NextResponse.json(
         { error: "link must be a Google Drive link." },
         { status: 400 },
@@ -73,7 +77,8 @@ export async function POST(
     }
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }

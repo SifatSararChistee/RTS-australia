@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 import { verifyAdminSession } from "@/lib/auth-utils";
+import { supabase } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
 
 // PATCH /api/applications/[id]/visa-grant-number
 // Body: { visa_grant_number: "VGN-2024-000123" }
@@ -39,7 +39,8 @@ export async function PATCH(
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }

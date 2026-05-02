@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 import { verifyAdminSession } from "@/lib/auth-utils";
+import { supabase } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
 
 const VALID_STATUSES = ["pending", "approved", "rejected"];
 
@@ -19,7 +19,9 @@ export async function PATCH(
 
     if (!status || !VALID_STATUSES.includes(status)) {
       return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}` },
+        {
+          error: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}`,
+        },
         { status: 400 },
       );
     }
@@ -39,7 +41,8 @@ export async function PATCH(
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }

@@ -1,8 +1,13 @@
 "use client";
 
-import { getAllApplicationsSummary } from "@/lib/applications";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+interface Application {
+  id: string;
+  full_name: string;
+  visa_type: string;
+}
 
 function getInitials(name: string): string {
   if (!name?.trim()) return "?";
@@ -17,12 +22,21 @@ function getInitials(name: string): string {
 export default function AllApplicantsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getAllApplicationsSummary().then((data) => {
-      setApplications(data);
-      setLoading(false);
-    });
+    fetch("/api/applicants")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        return res.json();
+      })
+      .then((data: Application[]) => {
+        setApplications(data);
+      })
+      .catch((err) => {
+        setError(err.message || "Failed to load applicants.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -43,7 +57,8 @@ export default function AllApplicantsPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-10">
-        {loading ? (
+        {/* Loading */}
+        {loading && (
           <div className="space-y-3">
             {[160, 130, 190, 145, 170].map((w, i) => (
               <div
@@ -64,7 +79,17 @@ export default function AllApplicantsPage() {
               </div>
             ))}
           </div>
-        ) : (
+        )}
+
+        {/* Error */}
+        {!loading && error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-center text-red-500 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Results */}
+        {!loading && !error && (
           <>
             <p className="text-sm text-gray-400 mb-5">
               {applications.length} applicant

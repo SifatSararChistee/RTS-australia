@@ -1,14 +1,48 @@
-import {
-  getAllApplicationsSummary,
-  getApplicationSummaryById,
-} from "@/lib/applications";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+interface ApplicationSummary {
+  id: string;
+  full_name: string;
+  visa_type: string;
+}
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+async function getAllApplicants(): Promise<ApplicationSummary[]> {
+  try {
+    const res = await fetch(`${BASE_URL}/api/applicants`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+async function getApplicantById(
+  id: string,
+): Promise<ApplicationSummary | null> {
+  try {
+    const res = await fetch(`${BASE_URL}/api/applicants/${id}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+// ── Static params ─────────────────────────────────────────────────────────────
+
 export async function generateStaticParams() {
-  const apps = await getAllApplicationsSummary();
+  const apps = await getAllApplicants();
   return apps.map((app) => ({ id: app.id }));
 }
+
+// ── Metadata ──────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({
   params,
@@ -16,11 +50,13 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const app = await getApplicationSummaryById(id);
+  const app = await getApplicantById(id);
   return {
     title: app ? `${app.full_name} — RTS Australia` : "Applicant Not Found",
   };
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getInitials(name: string): string {
   if (!name?.trim()) return "?";
@@ -32,13 +68,15 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default async function ApplicantProfilePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const app = await getApplicationSummaryById(id);
+  const app = await getApplicantById(id);
 
   if (!app) notFound();
 
