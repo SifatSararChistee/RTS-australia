@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -476,7 +476,10 @@ export default function ApplicationDetailPage() {
   const [docType, setDocType] = useState<DocType>("pdf");
   const [docError, setDocError] = useState("");
   const [docLoading, setDocLoading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const router = useRouter();
   // ── Fetch ────────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -541,6 +544,23 @@ export default function ApplicationDetailPage() {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
+  async function handleDelete() {
+    if (!app) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/applications/${app.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Application deleted.");
+      router.push("/admin/dashboard");
+    } catch {
+      toast.error("Failed to delete application.");
+    } finally {
+      setDeleteLoading(false);
+      setDeleteConfirm(false);
+    }
+  }
   async function handleAction(action: "approve" | "reject") {
     if (!app) {
       toast.error("Application not loaded yet");
@@ -1077,6 +1097,13 @@ export default function ApplicationDetailPage() {
               </div>
             )}
           </Section>
+
+          <button
+            onClick={() => setDeleteConfirm(true)}
+            className="px-3.5 py-2 rounded-xl border border-slate-200  text-xs font-semibold hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-red-600 text-white"
+          >
+            Delete Application
+          </button>
         </div>
 
         <motion.div
@@ -1209,6 +1236,71 @@ export default function ApplicationDetailPage() {
                 If the file does not load, click "Open in Drive". Ensure file
                 sharing is set to "Anyone with the link can view".
               </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete confirmation modal */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            >
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+              </div>
+              <h2 className="text-base font-semibold text-slate-900 mb-1">
+                Delete this application?
+              </h2>
+              <p className="text-sm text-slate-500 mb-6">
+                This will permanently delete the application for{" "}
+                <span className="font-semibold text-slate-700">
+                  {app.full_name}
+                </span>{" "}
+                and all associated documents. This action cannot be undone.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setDeleteConfirm(false)}
+                  disabled={deleteLoading}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteLoading}
+                  className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-60"
+                >
+                  {deleteLoading ? "Deleting…" : "Yes, delete"}
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
