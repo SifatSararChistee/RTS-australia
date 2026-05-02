@@ -1,31 +1,46 @@
-import {
-  ADMIN_COOKIE_NAME,
-  ADMIN_COOKIE_VALUE,
-  ADMIN_CREDENTIALS,
-} from "@/lib/auth";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const body = await request.json();
-  const { username, password } = body;
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+);
 
-  if (
-    username === ADMIN_CREDENTIALS.username &&
-    password === ADMIN_CREDENTIALS.password
-  ) {
+export async function POST(req: Request) {
+  try {
+    const { username, password } = await req.json();
+
+    // Supabase auth uses email — treat username as email
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username,
+      password,
+    });
+
+    if (error || !data.session) {
+      return NextResponse.json({ success: false }, { status: 401 });
+    }
+
     const response = NextResponse.json({ success: true });
-    response.cookies.set(ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE, {
+
+    // Store the access token in an httpOnly cookie
+    response.cookies.set("sb-access-token", data.session.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 8, // 8 hours
+      maxAge: data.session.expires_in,
       path: "/",
     });
-    return response;
-  }
 
-  return NextResponse.json(
-    { success: false, message: "Invalid credentials" },
-    { status: 401 },
-  );
+    response.cookies.set("sb-refresh-token", data.session.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: "/",
+    });
+
+    return response;
+  } catch {
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
 }

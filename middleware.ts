@@ -1,4 +1,3 @@
-import { ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE } from "@/lib/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -6,12 +5,14 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const cookie = request.cookies.get(ADMIN_COOKIE_NAME);
+    const accessToken = request.cookies.get("sb-access-token")?.value;
 
-    if (!cookie || cookie.value !== ADMIN_COOKIE_VALUE) {
+    if (!accessToken) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
+      const response = NextResponse.redirect(loginUrl);
+      response.headers.set("Cache-Control", "no-store");
+      return response;
     }
   }
 
