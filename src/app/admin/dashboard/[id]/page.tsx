@@ -327,7 +327,7 @@ function Section({
     >
       <div className="flex items-center gap-2.5 px-6 py-3.5 border-b border-slate-100 bg-slate-50/60">
         <span className="text-slate-400">{icon}</span>
-        <h2 className="text-[10px] font-semibold tracking-widest uppercase text-slate-500">
+        <h2 className="text-[14px] font-bold tracking-widest uppercase text-slate-700">
           {title}
         </h2>
       </div>
@@ -855,7 +855,7 @@ export default function ApplicationDetailPage() {
               </div>
               <button
                 onClick={handleBiometricsToggle}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 hover:border-slate-400 px-3 py-1.5 rounded-xl transition-all"
+                className="text-xs font-semibold text-slate-500 hover:text-slate-800 border border-slate-200 hover:border-slate-400 px-3 py-1.5 rounded-xl transition-all hover:bg-green-600 hover:text-white"
               >
                 Mark as {biometrics === "pending" ? "Completed" : "Pending"}
               </button>
