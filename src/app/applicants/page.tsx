@@ -1,6 +1,6 @@
 "use client";
 
-import { getAllApplications, type Application } from "@/lib/applications";
+import { getAllApplicationsSummary } from "@/lib/applications";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -19,7 +19,7 @@ export default function AllApplicantsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getAllApplications().then((data) => {
+    getAllApplicationsSummary().then((data) => {
       setApplications(data);
       setLoading(false);
     });

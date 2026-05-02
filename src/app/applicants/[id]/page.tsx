@@ -1,13 +1,12 @@
 import {
-  Application,
-  getAllApplications,
-  getApplicationById,
+  getAllApplicationsSummary,
+  getApplicationSummaryById,
 } from "@/lib/applications";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
-  const apps = await getAllApplications();
+  const apps = await getAllApplicationsSummary();
   return apps.map((app) => ({ id: app.id }));
 }
 
@@ -17,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const app = await getApplicationById(id);
+  const app = await getApplicationSummaryById(id);
   return {
     title: app ? `${app.full_name} — RTS Australia` : "Applicant Not Found",
   };
@@ -33,19 +32,13 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-const STATUS_STYLES: Record<Application["status"], string> = {
-  approved: "bg-green-50 text-green-700 border border-green-200",
-  pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
-  rejected: "bg-red-50 text-red-700 border border-red-200",
-};
-
 export default async function ApplicantProfilePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const app = await getApplicationById(id);
+  const app = await getApplicationSummaryById(id);
 
   if (!app) notFound();
 
