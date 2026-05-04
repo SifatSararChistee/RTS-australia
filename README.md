@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RTS Australia - Visa Application & Tracking System
 
-## Getting Started
+A modern visa application and tracking system designed for RTS Australia, enabling applicants to apply for visas and check their status, while providing administrators with a comprehensive portal to manage applications.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### For Applicants
+- **Visa Application**: A streamlined process for users to submit their visa applications.
+- **Status Tracking**: Real-time tracking of visa application status via a dedicated check page.
+- **Biometrics Status**: Specialized tracking for biometrics appointment and verification.
+- **Document Check**: Interface for users to verify and manage required documentation.
+
+### For Administrators
+- **Admin Dashboard**: A centralized hub for managing all incoming visa applications.
+- **Applicant Management**: Detailed views and management tools for individual applicant records.
+- **Secure Authentication**: Protected admin access to ensure data privacy and security.
+
+## 🛠 Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Backend & Database**: [Supabase](https://supabase.com/) (Auth & Database)
+- **UI Components**: [Lucide React](https://lucide.dev/) (Icons), [Framer Motion](https://www.framer.com/motion/) (Animations)
+- **Notifications**: [React Hot Toast](https://react-hot-toast.com/)
+
+## 📁 Project Structure
+
+```text
+src/
+├── app/
+│   ├── (public)/         # Publicly accessible pages (Apply, Check Visa, etc.)
+│   │   ├── apply/        # Visa application form
+│   │   ├── check-visa/   # Application status lookup
+│   │   └── ...
+│   ├── admin/            # Admin portal (Protected)
+│   │   ├── login/        # Admin authentication
+│   │   └── dashboard/     # Application management
+│   └── applicants/       # Applicant detailed views
+├── components/           # Reusable UI components (Navbar, Footer, etc.)
+└── lib/                  # Core utilities (Supabase clients, Auth helpers)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 20+
+- A Supabase account and project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
 
-## Learn More
+1. **Clone the repository**
+   ```bash
+   git clone <<repositoryrepository-url>
+   cd "RTS Australia"
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory and add your Supabase credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Development
 
-## Deploy on Vercel
+Run the development server:
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Build & Production
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Build the project for production:
+```bash
+npm run build
+```
+
+Start the production server:
+```bash
+npm run start
+```
+
+## 🛡️ Security
+- Admin routes are protected via Supabase Auth.
+- API interactions are handled through secure client-side and server-side utilities in `src/lib`.
+
+---
+© 2026 RTS Australia
